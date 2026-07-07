@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 from data_fetcher import DataFetcher
-from signal import SignalEngine
+from signal_engine import SignalEngine
 import json
 from datetime import datetime
 
