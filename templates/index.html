@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pro Trading Signals</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: #0a0e1a; color: #e0e0e0; min-height: 100vh; padding: 20px; }
+        
+        .header { text-align: center; padding: 20px 0 30px; border-bottom: 1px solid #1a2a3a; }
+        .header h1 { font-size: 32px; color: #00d4ff; letter-spacing: 2px; }
+        .header h1 span { color: #f0b90b; }
+        .header p { color: #8899aa; font-size: 14px; margin-top: 5px; }
+        
+        .controls { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; padding: 20px 0; }
+        .controls select, .controls button {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 1px solid #1a2a3a;
+            background: #111927;
+            color: #e0e0e0;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .controls select:hover, .controls button:hover {
+            border-color: #00d4ff;
+        }
+        .controls button {
+            background: #00d4ff;
+            color: #0a0e1a;
+            font-weight: bold;
+            border: none;
+        }
+        .controls button:hover {
+            background: #00b8e6;
+            transform: scale(1.02);
+        }
+        
+        .signal-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 10px;
+        }
+        
+        .signal-card {
+            background: #111927;
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid #1a2a3a;
+            transition: all 0.3s;
+        }
+        .signal-card:hover {
+            border-color: #00d4ff;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(0,212,255,0.1);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .card-header .pair {
+            font-size: 20px;
+            font-weight: bold;
+            color: #fff;
+        }
+        .card-header .timeframe {
+            font-size: 12px;
+            color: #8899aa;
+            background: #1a2a3a;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+        
+        .signal-badge {
+            font-size: 18px;
+            font-weight: bold;
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 10px 0;
+        }
+        .signal-badge.BUY { background: #00c853; color: #fff; }
+        .signal-badge.STRONG_BUY { background: #00e676; color: #0a0e1a; }
+        .signal-badge.SELL { background: #ff1744; color: #fff; }
+        .signal-badge.STRONG_SELL { background: #ff5252; color: #0a0e1a; }
+        .signal-badge.HOLD { background: #ffa726; color: #0a0e1a; }
+        
+        .signal-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin: 12px 0;
+            font-size: 13px;
+        }
+        .signal-details .label { color: #8899aa; }
+        .signal-details .value { color: #fff; font-weight: bold; }
+        
+        .next-candle {
+            background: #0d1520;
+            border-radius: 8px;
+            padding: 10px;
+            margin: 10px 0;
+            text-align: center;
+            border-left: 3px solid #00d4ff;
+        }
+        .next-candle .candle-color { font-size: 16px; font-weight: bold; }
+        .next-candle .probability { color: #00d4ff; }
+        
+        .fake-alert {
+            background: #ff1744;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            text-align: center;
+            margin: 8px 0;
+        }
+        
+        .reason {
+            color: #8899aa;
+            font-size: 13px;
+            margin-top: 10px;
+            padding: 10px;
+            background: #0d1520;
+            border-radius: 6px;
+            line-height: 1.5;
+        }
+        
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #8899aa;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #1a2a3a;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #8899aa;
+        }
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s infinite;
+        }
+        @keyframes dots {
+            0% { content: '.'; }
+            33% { content: '..'; }
+            66% { content: '...'; }
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: #556677;
+            font-size: 12px;
+            border-top: 1px solid #1a2a3a;
+            margin-top: 30px;
+        }
+        
+        .confidence-bar {
+            width: 100%;
+            height: 4px;
+            background: #1a2a3a;
+            border-radius: 2px;
+            margin: 8px 0;
+            overflow: hidden;
+        }
+        .confidence-bar .fill {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 0.5s;
+        }
+        .confidence-bar .fill.high { background: #00c853; }
+        .confidence-bar .fill.medium { background: #ffa726; }
+        .confidence-bar .fill.low { background: #ff1744; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📊 <span>PRO</span> TRADING SIGNALS</h1>
+        <p>Real-time | Multi-Asset | AI-Powered | Fake Breakout Filter</p>
+    </div>
+    
+    <div class="controls">
+        <select id="timeframeSelect">
+            <option value="5min">5 Minutes</option>
+            <option value="15min" selected>15 Minutes</option>
+            <option value="30min">30 Minutes</option>
+        </select>
+        <button onclick="fetchAllSignals()">🔄 Refresh All Signals</button>
+        <span style="color:#556677;font-size:13px;align-self:center;" id="lastUpdate">Last update: --</span>
+    </div>
+    
+    <div class="signal-grid" id="signalGrid">
+        <div class="loading">Loading signals</div>
+    </div>
+    
+    <div class="footer">
+        ⚠️ Educational purposes only. Not financial advice. Trade at your own risk.
+        <br>Data from free APIs: Twelve Data, Binance, Metals-API
+    </div>
+
+    <script>
+        const pairs = ['USDJPY', 'XAUUSD', 'BTC', 'NAS100'];
+        const pairLabels = {
+            'USDJPY': 'USD/JPY',
+            'XAUUSD': 'Gold (XAU/USD)',
+            'BTC': 'Bitcoin (BTC/USD)',
+            'NAS100': 'NASDAQ 100'
+        };
+        
+        async function fetchAllSignals() {
+            const timeframe = document.getElementById('timeframeSelect').value;
+            const grid = document.getElementById('signalGrid');
+            grid.innerHTML = '<div class="loading">Fetching signals</div>';
+            
+            const results = {};
+            let allLoaded = 0;
+            
+            for (const pair of pairs) {
+                try {
+                    const url = `/api/signal/${pair}/${timeframe}`;
+                    const response = await fetch(url);
+                    const data = await response.json();
+                    results[pair] = data;
+                    allLoaded++;
+                } catch (e) {
+                    results[pair] = { error: 'Failed to fetch' };
+                }
+            }
+            
+            renderSignals(results, timeframe);
+            document.getElementById('lastUpdate').textContent = `Last update: ${new Date().toLocaleTimeString()}`;
+        }
+        
+        function renderSignals(results, timeframe) {
+            const grid = document.getElementById('signalGrid');
+            let html = '';
+            
+            for (const pair of pairs) {
+                const data = results[pair];
+                if (!data || data.error) {
+                    html += `
+                        <div class="signal-card">
+                            <div class="card-header">
+                                <span class="pair">${pairLabels[pair] || pair}</span>
+                                <span class="timeframe">${timeframe}</span>
+                            </div>
+                            <div style="color:#ff1744;text-align:center;padding:20px;">⚠️ ${data?.error || 'No data'}</div>
+                        </div>
+                    `;
+                    continue;
+                }
+                
+                const signal = data.signal || 'HOLD';
+                const strength = data.strength || 'LOW';
+                const confidence = data.confidence || 0;
+                const nextCandle = data.next_candle || {};
+                const fakeAlert = data.fake_alert || null;
+                
+                let confClass = 'low';
+                if (confidence > 70) confClass = 'high';
+                else if (confidence > 45) confClass = 'medium';
+                
+                html += `
+                    <div class="signal-card">
+                        <div class="card-header">
+                            <span class="pair">${pairLabels[pair] || pair}</span>
+                            <span class="timeframe">${timeframe}</span>
+                        </div>
+                        
+                        <div class="signal-badge ${signal}">
+                            ${signal.replace('_', ' ')}
+                        </div>
+                        
+                        <div class="signal-details">
+                            <div><span class="label">Entry</span> <span class="value">${data.entry || '--'}</span></div>
+                            <div><span class="label">Stop Loss</span> <span class="value">${data.stop_loss || '--'}</span></div>
+                            <div><span class="label">Take Profit</span> <span class="value">${data.take_profit || '--'}</span></div>
+                            <div><span class="label">Confidence</span> <span class="value">${confidence}%</span></div>
+                        </div>
+                        
+                        <div class="confidence-bar">
+                            <div class="fill ${confClass}" style="width:${confidence}%"></div>
+                        </div>
+                        
+                        ${fakeAlert ? `<div class="fake-alert">${fakeAlert}</div>` : ''}
+                        
+                        <div class="next-candle">
+                            <div>🔮 Next Candle: <span class="candle-color">${nextCandle.color || 'NEUTRAL'}</span></div>
+                            <div class="probability">Probability: ${nextCandle.probability || 50}%</div>
+                            <div style="font-size:11px;color:#8899aa;">${nextCandle.reason || ''}</div>
+                        </div>
+                        
+                        <div class="reason">📌 ${data.reason || 'No clear signal'}</div>
+                        
+                        <div class="stats-row">
+                            <span>Last: ${data.stats?.last_close || '--'}</span>
+                            <span>24h High: ${data.stats?.high_24h || '--'}</span>
+                            <span>24h Low: ${data.stats?.low_24h || '--'}</span>
+                            <span>Change: ${data.stats?.change || 0}%</span>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            grid.innerHTML = html;
+        }
+        
+        // Auto-refresh every 60 seconds
+        fetchAllSignals();
+        setInterval(fetchAllSignals, 60000);
+        
+        // Refresh on timeframe change
+        document.getElementById('timeframeSelect').addEventListener('change', fetchAllSignals);
+    </script>
+</body>
+</html>
