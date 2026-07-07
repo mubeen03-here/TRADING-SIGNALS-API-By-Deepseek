@@ -1,7 +1,8 @@
 flask==2.3.3
 requests==2.31.0
-pandas==2.1.0
-numpy==1.25.2
+pandas>=2.2.0
+numpy>=1.26.0
 python-dotenv==1.0.0
 gunicorn==21.2.0
 websocket-client==1.6.1
+cython>=3.0.0
