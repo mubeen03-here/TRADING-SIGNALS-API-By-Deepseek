@@ -19,7 +19,7 @@ class DataFetcher:
                 "symbol": symbol,
                 "interval": interval,
                 "outputsize": outputsize,
-                "apikey": "demo"
+                "apikey": "04686c9409744e3d8453e3a371796a3c"
             }
             response = requests.get(url, params=params, timeout=10)
             data = response.json()
